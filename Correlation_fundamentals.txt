@@ -1,0 +1,26 @@
+#SET 1 month, 3 month, 1year CORRELATION USD/OIL
+
+def corroil10=correlation(close(symbol=getsymbol()),close("/CL"),4);
+def corrUSD10=correlation(close(symbol=getsymbol()),close("$DXY"),4);
+#SET 3-MONTH CORRELATION
+
+def corrOIL60=correlation(close(),close("/CL"),12);
+def corrUSD60=correlation(close(),close("$DXY"),12);
+#SET 1 YEAR CORRELATION
+
+def corroil252=correlation(close(),close("/CL"),52);
+def corrUSD252=correlation(close(),close("$DXY"),52);
+
+
+#ADD LABELS
+
+addlabel(yes,"1M_USD:"+corrUSD10,color.WHITE);
+addlabel(yes,"3M_USD:"+corrusd60,color.WHITE);
+addlabel(yes,"1YR_USD:"+corrUSD252,color.white);
+addlabel(yes,"1M_OIL:"+corrOIL10,color.ORANGE);
+
+
+addlabel(yes,"3M_OIL:"+corroil60,color.orange);
+addlabel(yes,"1YR_OIL:"+corrOIL252,color.orange);
+
+
