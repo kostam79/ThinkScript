@@ -1,0 +1,9 @@
+#Adds only label in relation to market sentiment:Trim, tick , put/call ratio, sp500 up-down volume, total sp500 volume
+def trim=close("$trin");def tick=close("$tick");
+def vol=close("/vx");
+def pc=close("$pcsp");def tvol=close("$tvolspc");
+addlabel(yes,"trim "+trim,if trim <1 then color.green else color.red);
+addlabel(yes,"tick "+tick, if tick <0 then color.red else color.green);
+addlabel(yes,"/vx "+vol,color.cyan);addlabel(yes,"sp_p/c "+pc,color.white);
+addlabel(yes,"tvol500 "+tvol,color.white);
+def volume=round(close("$volspd"),4);addlabel(yes,"volu_sp "+volume, if volume <0 then color.red else color.green);

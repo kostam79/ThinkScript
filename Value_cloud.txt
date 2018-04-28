@@ -1,0 +1,4 @@
+# To use with Market Forecast study.Discretionary areas at 80,30
+plot cloudhigh =80;# If(CloudTest and ShowCloud, VAH, Na);
+plot cloudlow  =30;# If(CloudTest and ShowCloud, VAL, Na);
+AddCloud(cloudhigh, cloudlow, Color.GRAY, Color.GRAY);
