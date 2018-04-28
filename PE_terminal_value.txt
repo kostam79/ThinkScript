@@ -1,0 +1,70 @@
+# A short cut for terminal valuation, using pe fundamental parameters:growth, disccount factor and TTM earnings.
+# Labels only, useful specially for mature, cyclical companies with high macro exposure
+def rfr = .026;def erp = .05;def betal = Beta(length = 756, index = "spx");
+def disc = rfr + betal * erp;def blumebeta=betal*.75+.25*1;def discp=rfr+blumebeta*erp;
+#Payout Scenarios Short/long
+def payout = 0.45;def payout2=.25;def payout3=.50;
+def payoutl=.80;def payoutl2=.90;def payoutl3=1;
+#Growth Scenarios
+def growth = .035;def glow = .025;def superg = .065;def growth0=0;def super15g=.15;
+def growthl=.035;def grlowl=.025;def supergl=.05;def growth0l=0;
+#Calculate EPS and Expected EPS growth
+input lenght = 252;
+input basis = {default Annual, Monthly, Weekly, Daily};
+def EE = if IsNaN(GetEstimatedEarnings()) then 0 else GetEstimatedEarnings();
+def AE = if IsNaN(GetActualEarnings()) then 0 else GetActualEarnings();
+def EE_TTM = Sum(EE, lenght);def EPS_TTM = Sum(AE, lenght);
+
+#We calculate three possible scenarios on a 2-stage growth model(3yr+perp) using EPS
+#Define short term growth and period for projection=3 years/payoutratio
+def years=3;def multiplier=1-(power((1+growth),years)/(power((1+disc),years)));def geps=(EE_TTM/EPS_TTM)-1;
+def priceshort=(EPS_TTM*payout*(1+growth)*multiplier)/(disc-growth);
+def pricelong=(((EPS_TTM*payoutl)*(power((1+growth),3)))*(1+growthl))/((discp-growthl)*(power((1+discp),years)));
+def price=priceshort+pricelong;def pricedelta=(close()/price)-1;
+#Base Scenario 5/3.5
+def multiplier5=1-(power((1+0.05),years)/(power((1+disc),years)));
+def priceshort5=(EPS_TTM*payout*(1+.05)*multiplier5)/(disc-0.05);
+def pricelong5=(((EPS_TTM*payoutl)*(power((1+.05),3)))*(1+.035))/((discp-0.035)*(power((1+discp),years)));
+def price5=priceshort5+pricelong5;
+#Base Scenario 8/5
+def multiplier8=1-(power((1+0.08),years)/(power((1+disc),years)));
+def priceshort8=(EPS_TTM*payout*(1+.08)*multiplier8)/(disc-0.08);
+def pricelong8=(((EPS_TTM*payoutl)*(power((1+.08),3)))*(1+.035))/((discp-0.035)*(power((1+discp),years)));
+def price8=priceshort8+pricelong8;
+#Scenario zero growth(Inflation rate)
+def multiplierll=1-(power((1+growth0),years)/(power((1+disc),years)));
+def priceshort11=(EPS_TTM*payout*(1+growth0)*multiplierll)/(disc-growth0);
+def pricelong11=(((EPS_TTM*payoutl)*(power((1+growth0),3)))*(1+growth0l))/((discp-growth0l)*(power((1+discp),years)));
+def pricezero=priceshort11+pricelong11;
+
+def multiplierl=1-(power((1+glow),years)/(power((1+disc),years)));
+def priceshort1=(EPS_TTM*payout*(1+glow)*multiplierl)/(disc-glow);
+def pricelong1=(((EPS_TTM*payoutl)*(power((1+glow),3)))*(1+grlowl))/((discp-grlowl)*(power((1+discp),years)));
+def price1=priceshort1+pricelong1;
+
+#Growth Scenario
+def multiplier2=1-(power((1+superg),years)/(power((1+disc),years)));
+def priceshort2=(EPS_TTM*payout*(1+superg)*multiplier2)/(disc-superg);
+def pricelong2=(((EPS_TTM*payoutl)*(power((1+superg),3)))*(1+supergl))/((discp-supergl)*(power((1+discp),years)));
+def price2=priceshort2+pricelong2;
+
+#Supergrowth Scenario
+def multipliersg=1-(power((1+super15g),years)/(power((1+disc),years)));
+def priceshortsg=(EPS_TTM*payout*(1+super15g)*multiplier2)/(disc-super15g);
+def pricelongsg=(((EPS_TTM*payoutl)*(power((1+super15g),3)))*(1+supergl))/((discp-supergl)*(power((1+discp),years)));
+def pricesg=priceshortsg+pricelongsg;
+
+#Add Labels
+#AddLabel(yes,"Price is :"+if pricedelta >0 then "Overpriced "+pricedelta else "Underpriced "+pricedelta,if pricedelta >0 then color.red else color.green) ;
+Addlabel(yes,"Price 0/0% :"+pricezero,color.pink);
+Addlabel(yes,"Price 2.5/2.5% :"+price1,color.pinK);
+Addlabel(yes,"Price 3.5/3.5% :"+price,color.pink);
+Addlabel(yes,"Price 5.0/3.5% :"+price5,color.liGHT_ORANGE);
+#Addlabel(yes,"Price 8.0/5% :"+price8,color.lime);
+#Addlabel(yes,"Price 6.5/5.5% :"+price2,color.lime);
+#Addlabel(yes,"Price 15.5/5.5% :"+pricesg,color.lime);
+#addlabel(yes,"discountl :"+disc,color.blue);addlabel(yes,"Perp val :"+(1/disc),color.blue);
+#AddLabel(yes, "3yrBeta:" +betal, Color.BLACK);Addlabel(yes,"Exp_EPS_growth :"+geps);
+
+
+
