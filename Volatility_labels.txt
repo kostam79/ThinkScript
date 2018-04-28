@@ -1,0 +1,38 @@
+# Add labels only in relation to implied volatility:1 day, 5 days and 10 days change. It also adds the existing implied volatility of the stock and its IV rank(52 weeks)
+
+def iv5days =if isnan(imp_Volatility(period=aggregationPeriod.DAY)) then iv5days[1] else Imp_Volatility(period=aggregationPeriod.DAY) - imp_Volatility(period=aggregationPeriod.DAY)[5] ;
+
+def iv1day = if IsNaN(imp_volatility(period=aggregationPeriod.DAY)) 
+    then iv1day[1]                    
+    else Imp_Volatility(period=aggregationPeriod.DAY) - Imp_Volatility(period=aggregationPeriod.DAY)[1] ;
+
+def ivolearn=if hasearnings() ==1 then 1 else 0;def contar=sum(ivolearn,255);#addlabel(yes,"Earn :" +contar);
+def vol=if hasearnings() ==1 then impVolatility()[1] else 0;def sumar=sum(vol,255);def vole=sumar/contar;
+def contar3=sum(ivolearn,765);def sumar3=sum(vol,765);def vole3=sumar3/contar3;
+def iv10days = if IsNaN(imp_volatility(period=aggregationPeriod.DAY)) 
+    then iv10days[1]                    
+    else Imp_Volatility(period=aggregationPeriod.DAY) - Imp_Volatility(period=aggregationPeriod.DAY)[10]  ;
+
+AddLabel(yes, " IV_1d" + iv1day,if iv1day <0 then color.red else color.darK_GREEN);
+AddLabel(yes, " IV_5d" + iv5days,if iv5days <0 then color.red else color.dark_green);
+AddLabel(yes, " IV_10d" + iv10days,if iv10days <0 then color.red else color.dark_green);
+
+#Adds implied volatility label only
+AddLabel(yes,"Implied Vol :"+ImpVolatility(),color.liME);
+
+#Adds the IV rank label
+def ivClean = if isNaN(impVolatility()) 
+    then ivClean[1]                     
+    else impVolatility() * 100 ;
+
+def ivHi = HighestAll(ivClean) ;    
+def ivLo =  LowestAll(ivClean) ;      
+
+def ivRange = ivHi - ivLo ;             
+
+def ivRank = Round( 100 * (ivClean - ivLo) / ivRange, 1) ;  # IV rank
+def ratio=(imp_volatility()/historicalVolatility())*100;
+def High=highestAll(ratio);def low=lowestAll(ratio);
+def hirange=High - low;def ivhist = Round( 100 * (ratio - low) / hirange, 1) ;
+
+AddLabel(yes,"IVRANK:"+ivRank,color.orange);#plot paco=impVolatility();
